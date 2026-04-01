@@ -82,7 +82,7 @@ class PluginConfiguration:
             scalable=False,
             stateless=True,
             usePluginToken=False,
-            serviceStartTime=int(self._start_time),
+            serviceStartTime=int(self._start_time * 1000),
             lastRegistrationTime=now_ms,
         )
 
