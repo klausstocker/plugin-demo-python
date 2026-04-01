@@ -12,6 +12,20 @@ from typing import Dict, List, Optional, Type
 
 import httpx
 
+
+def _to_date_integer(dt: datetime) -> int:
+    """Convert a datetime to a Java Datum 'DateInteger' (seconds since 1 Jan year 0).
+
+    Java's ``Datum.toDateInteger(LocalDateTime)`` returns ``days * 86400 + time_of_day``
+    where *days* is counted from 1 January of year 0 (ISO proleptic Gregorian, i.e. 1 BCE).
+    Python's ``date.toordinal()`` starts at 1 for 1 Jan year 1, so year 0 contributes
+    an extra 366 days (year 0 is a proleptic leap year: 366 days).
+    """
+    days_since_year0 = dt.date().toordinal() + 365  # ordinal(0001-01-01)==1; add 365 to account for year 0's 366 days
+    time_of_day = dt.hour * 3600 + dt.minute * 60 + dt.second
+    return days_since_year0 * 86400 + time_of_day
+
+
 from app.config import settings
 from app.models.dto import (
     AdminInfoDto,
@@ -58,7 +72,7 @@ class PluginConfiguration:
         except OSError:
             ip = ""
 
-        now_ms = int(time.time() * 1000)
+        now_ms = _to_date_integer(datetime.now())
 
         payload = ConfigServiceDto(
             name=self.SERVICE_NAME,
@@ -82,7 +96,7 @@ class PluginConfiguration:
             scalable=False,
             stateless=True,
             usePluginToken=False,
-            serviceStartTime=int(self._start_time * 1000),
+            serviceStartTime=_to_date_integer(datetime.fromtimestamp(self._start_time)),
             lastRegistrationTime=now_ms,
         )
 
