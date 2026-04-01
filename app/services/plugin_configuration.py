@@ -59,6 +59,7 @@ class PluginConfiguration:
             ip = ""
 
         now_ms = int(time.time() * 1000)
+        base = setup_uri.rstrip("/")
 
         payload = ConfigServiceDto(
             name=self.SERVICE_NAME,
@@ -72,44 +73,56 @@ class PluginConfiguration:
             nwLettoAddress=settings.network_letto_address,
             dockerName=settings.docker_container_name,
             uriIntern=settings.letto_plugin_uri_intern or f"http://{settings.network_letto_address}:{settings.port}",
-            uriInternOk=True,
-            uriExtern=settings.letto_plugin_uri_extern or "",
-            uriExternOk=bool(settings.letto_plugin_uri_extern),
-            username=settings.letto_user_user_name,
-            password=settings.letto_user_user_password,
             extern=False,
+            uriExtern=settings.letto_plugin_uri_extern or "",
             plugin=True,
             scalable=False,
             stateless=True,
+            username=settings.letto_user_user_name,
+            password=settings.letto_user_user_password,
             usePluginToken=False,
             serviceStartTime=int(self._start_time * 1000),
             lastRegistrationTime=now_ms,
         )
 
-        url = f"{setup_uri.rstrip('/')}/config/auth/user/registerplugin"
+        registration_url = f"{base}/config/auth/user/registerplugin"
+        login_url = f"{base}/login"
+
         try:
-            response = httpx.post(
-                url,
-                json=payload.model_dump(),
-                auth=(settings.letto_user_user_name, settings.letto_user_user_password),
-                timeout=10.0,
-            )
-            response.raise_for_status()
-            result = RegisterServiceResultDto.model_validate(response.json())
-            if not result.registrationOK:
-                logger.error("Setup service refused registration: %s", result.msg)
-            else:
-                status = "NEW" if result.newRegistered else "UPDATED"
-                counter = (
-                    f", {result.registrationCounter} instances"
-                    if result.registrationCounter > 1
-                    else ""
+            with httpx.Client(timeout=10.0, follow_redirects=True) as client:
+                # Step 1: form-login to obtain a session cookie (JSESSIONID)
+                login_resp = client.post(
+                    login_url,
+                    data={
+                        "username": settings.letto_user_user_name,
+                        "password": settings.letto_user_user_password,
+                    },
                 )
-                logger.info("Plugin registered in setup-service %s%s", status, counter)
+                if "error" in str(login_resp.url):
+                    logger.error(
+                        "Login to setup service failed for user '%s' – check LETTO_USER_USER_NAME / LETTO_USER_USER_PASSWORD",
+                        settings.letto_user_user_name,
+                    )
+                    return
+
+                # Step 2: register using the authenticated session cookie
+                response = client.post(registration_url, json=payload.model_dump())
+                response.raise_for_status()
+                result = RegisterServiceResultDto.model_validate(response.json())
+                if not result.registrationOK:
+                    logger.error("Setup service refused registration: %s", result.msg)
+                else:
+                    status = "NEW" if result.newRegistered else "UPDATED"
+                    counter = (
+                        f", {result.registrationCounter} instances"
+                        if result.registrationCounter > 1
+                        else ""
+                    )
+                    logger.info("Plugin registered in setup-service %s%s", status, counter)
         except httpx.HTTPStatusError as exc:
             logger.error("Setup service returned error %s: %s", exc.response.status_code, exc.response.text)
         except httpx.RequestError as exc:
-            logger.error("Setup service cannot be reached at %s: %s", url, exc)
+            logger.error("Setup service cannot be reached at %s: %s", registration_url, exc)
 
     def register_plugin(self, name: str, plugin_class: Type[PluginService]) -> None:
         """Register a plugin implementation under the given type name."""
