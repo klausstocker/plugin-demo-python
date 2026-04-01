@@ -27,7 +27,8 @@ COPY app ./app
 COPY scripts/start-python.sh /scripts/start.sh
 COPY scripts/healthcheck-python.sh /scripts/healthcheck.sh
 
-RUN chmod 755 /scripts/*.sh
+RUN sed -i 's/\r$//' /scripts/*.sh && \
+    chmod 755 /scripts/*.sh
 
 EXPOSE 8080
 
