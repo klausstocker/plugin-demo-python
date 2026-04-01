@@ -11,6 +11,15 @@ class Settings(BaseSettings):
     swagger_ui_path: str = "/plugindemo/swagger-ui"
     openapi_url: str = "/plugindemo/v3/api-docs"
 
+    # Setup-service registration
+    letto_setup_uri: str = ""
+    letto_user_user_name: str = "user"
+    letto_user_user_password: str = ""
+    network_letto_address: str = "letto-plugindemo-python"
+    docker_container_name: str = "letto-plugindemo-python"
+    letto_plugin_uri_intern: str = ""
+    letto_plugin_uri_extern: str = ""
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

@@ -2,21 +2,30 @@
 
 from __future__ import annotations
 
+import logging
 import platform
 import socket
+import sys
 import time
 from datetime import datetime
 from typing import Dict, List, Optional, Type
 
+import httpx
+
+from app.config import settings
 from app.models.dto import (
     AdminInfoDto,
+    ConfigServiceDto,
     PluginConfigDto,
     PluginConfigurationInfoDto,
     PluginGeneralInfo,
     PluginGeneralInfoList,
+    RegisterServiceResultDto,
     ServiceInfoDTO,
 )
 from app.services.plugin_service import PluginService
+
+logger = logging.getLogger(__name__)
 
 
 class PluginConfiguration:
@@ -35,6 +44,72 @@ class PluginConfiguration:
     def init(self) -> None:
         """Called once at application startup."""
         pass
+
+    def register_plugin_in_setup(self) -> None:
+        """Register this service with the external LeTTo setup service."""
+        setup_uri = settings.letto_setup_uri
+        if not setup_uri:
+            logger.info("LETTO_SETUP_URI not configured – skipping setup-service registration")
+            return
+
+        hostname = socket.gethostname()
+        try:
+            ip = socket.gethostbyname(hostname)
+        except OSError:
+            ip = ""
+
+        now_ms = int(time.time() * 1000)
+
+        payload = ConfigServiceDto(
+            name=self.SERVICE_NAME,
+            version=self.VERSION,
+            author=self.AUTHOR,
+            license=self.LICENSE,
+            bs=platform.system(),
+            ip=ip,
+            encoding=sys.getdefaultencoding(),
+            programmingLanguage=f"Python {sys.version.split()[0]}",
+            nwLettoAddress=settings.network_letto_address,
+            dockerName=settings.docker_container_name,
+            uriIntern=settings.letto_plugin_uri_intern or f"http://{settings.network_letto_address}:{settings.port}",
+            uriInternOk=True,
+            uriExtern=settings.letto_plugin_uri_extern or "",
+            uriExternOk=bool(settings.letto_plugin_uri_extern),
+            username=settings.letto_user_user_name,
+            password=settings.letto_user_user_password,
+            extern=False,
+            plugin=True,
+            scalable=False,
+            stateless=True,
+            usePluginToken=False,
+            serviceStartTime=int(self._start_time * 1000),
+            lastRegistrationTime=now_ms,
+        )
+
+        url = f"{setup_uri.rstrip('/')}/config/auth/user/registerplugin"
+        try:
+            response = httpx.post(
+                url,
+                json=payload.model_dump(),
+                auth=(settings.letto_user_user_name, settings.letto_user_user_password),
+                timeout=10.0,
+            )
+            response.raise_for_status()
+            result = RegisterServiceResultDto.model_validate(response.json())
+            if not result.registrationOK:
+                logger.error("Setup service refused registration: %s", result.msg)
+            else:
+                status = "NEW" if result.newRegistered else "UPDATED"
+                counter = (
+                    f", {result.registrationCounter} instances"
+                    if result.registrationCounter > 1
+                    else ""
+                )
+                logger.info("Plugin registered in setup-service %s%s", status, counter)
+        except httpx.HTTPStatusError as exc:
+            logger.error("Setup service returned error %s: %s", exc.response.status_code, exc.response.text)
+        except httpx.RequestError as exc:
+            logger.error("Setup service cannot be reached at %s: %s", url, exc)
 
     def register_plugin(self, name: str, plugin_class: Type[PluginService]) -> None:
         """Register a plugin implementation under the given type name."""

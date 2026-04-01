@@ -25,6 +25,13 @@ services:
       - APP_NAME=plugindemo
       - PORT=8080
       - LOG_LEVEL=info
+      - LETTO_SETUP_URI=${LETTO_SETUP_URI:-}
+      - LETTO_USER_USER_NAME=${LETTO_USER_USER_NAME:-user}
+      - LETTO_USER_USER_PASSWORD=${LETTO_USER_USER_PASSWORD:-}
+      - NETWORK_LETTO_ADDRESS=${NETWORK_LETTO_ADDRESS:-letto-plugindemo-python}
+      - DOCKER_CONTAINER_NAME=${DOCKER_CONTAINER_NAME:-letto-plugindemo-python}
+      - LETTO_PLUGIN_URI_INTERN=${LETTO_PLUGIN_URI_INTERN:-}
+      - LETTO_PLUGIN_URI_EXTERN=${LETTO_PLUGIN_URI_EXTERN:-}
     ports:
       - "${PLUGINDEMO_PORT:-8080}:8080"
     networks:
