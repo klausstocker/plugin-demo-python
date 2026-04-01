@@ -33,7 +33,7 @@ class PluginConfiguration:
 
     SERVICE_NAME = "plugin-demo-python"
     VERSION = "0.1"
-    AUTHOR = "letto.at"
+    AUTHOR = "Klaus Stocker"
     LICENSE = "Apache-2.0"
 
     def __init__(self) -> None:
@@ -82,7 +82,7 @@ class PluginConfiguration:
             scalable=False,
             stateless=True,
             usePluginToken=False,
-            serviceStartTime=int(self._start_time * 1000),
+            serviceStartTime=int(self._start_time),
             lastRegistrationTime=now_ms,
         )
 
