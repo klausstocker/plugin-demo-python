@@ -31,7 +31,7 @@ services:
       - server_secret=${SERVER_SECRET:-YWJj}
       - letto_local_privatkey=${LETTO_LOCAL_PRIVATE_KEY:-}
       - letto_local_publickey=${LETTO_LOCAL_PUBLIC_KEY:-}
-      - letto_user_user_password=${SERVICE_USER_PASSWORD}
+      - service_user_password=${SERVICE_USER_PASSWORD}
       - letto_user_gast_password=${SERVICE_GAST_PASSWORD}
       - letto_user_admin_password=${SERVICE_ADMIN_PASSWORD}
       - letto_setup_uri=${LETTO_SETUP_URI:-http://letto-setup.nw-letto:8096}

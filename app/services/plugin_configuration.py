@@ -75,8 +75,8 @@ class PluginConfiguration:
             uriInternOk=True,
             uriExtern=settings.letto_plugin_uri_extern or "",
             uriExternOk=bool(settings.letto_plugin_uri_extern),
-            username=settings.letto_user_user_name,
-            password=settings.letto_user_user_password,
+            username=settings.service_user_username,
+            password=settings.service_user_paswword,
             extern=False,
             plugin=True,
             scalable=False,
@@ -88,10 +88,12 @@ class PluginConfiguration:
 
         url = f"{setup_uri.rstrip('/')}/config/auth/user/registerplugin"
         try:
+            print(f'{settings.service_user_username=}')
+            print(f'{settings.service_user_paswword=}')
             response = httpx.post(
                 url,
                 json=payload.model_dump(),
-                auth=(settings.letto_user_user_name, settings.letto_user_user_password),
+                auth=httpx.BasicAuth(username=settings.service_user_username, password=settings.service_user_paswword),
                 timeout=10.0,
             )
             response.raise_for_status()
