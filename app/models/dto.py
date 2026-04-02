@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Dict, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.models.enums import (
     CALCERGEBNISTYPE,
@@ -57,6 +57,11 @@ class VarDto(BaseModel):
 
 class VarHashDto(BaseModel):
     vars: Dict[str, VarDto] = Field(default_factory=dict)
+
+    @field_validator("vars", mode="before")
+    @classmethod
+    def _coerce_vars(cls, v):  # noqa: N805
+        return v if v is not None else {}
 
     def get_string(self, key: str) -> Optional[str]:
         v = self.vars.get(key)
@@ -147,9 +152,19 @@ class PluginGeneralInfo(BaseModel):
     useMVars: bool = True
     pluginServiceURL: Optional[str] = None
 
+    @field_validator("javascriptLibraries", "javascriptLibrariesLocal", mode="before")
+    @classmethod
+    def _coerce_lists(cls, v):  # noqa: N805
+        return v if v is not None else []
+
 
 class PluginGeneralInfoList(BaseModel):
     pluginInfos: List[PluginGeneralInfo] = Field(default_factory=list)
+
+    @field_validator("pluginInfos", mode="before")
+    @classmethod
+    def _coerce_list(cls, v):  # noqa: N805
+        return v if v is not None else []
 
 
 # ---------------------------------------------------------------------------
@@ -201,6 +216,11 @@ class PluginQuestionDto(BaseModel):
     varsMaxima: Optional[VarHashDto] = None
     mvars: Optional[VarHashDto] = None
 
+    @field_validator("subQuestions", "images", "imagesContent", mode="before")
+    @classmethod
+    def _coerce_lists(cls, v):  # noqa: N805
+        return v if v is not None else []
+
 
 # ---------------------------------------------------------------------------
 # Plugin DTO
@@ -216,6 +236,11 @@ class PluginDto(BaseModel):
     height: int = 0
     params: Dict[str, str] = Field(default_factory=dict)
 
+    @field_validator("params", mode="before")
+    @classmethod
+    def _coerce_dict(cls, v):  # noqa: N805
+        return v if v is not None else {}
+
 
 # ---------------------------------------------------------------------------
 # Dataset DTOs
@@ -230,6 +255,11 @@ class PluginDatasetDto(BaseModel):
 
 class PluginDatasetListDto(BaseModel):
     datasets: List[PluginDatasetDto] = Field(default_factory=list)
+
+    @field_validator("datasets", mode="before")
+    @classmethod
+    def _coerce_list(cls, v):  # noqa: N805
+        return v if v is not None else []
 
 
 # ---------------------------------------------------------------------------
@@ -260,10 +290,20 @@ class PluginRenderDto(BaseModel):
     source: Optional[str] = None
     images: Dict[str, str] = Field(default_factory=dict)
 
+    @field_validator("images", mode="before")
+    @classmethod
+    def _coerce_dict(cls, v):  # noqa: N805
+        return v if v is not None else {}
+
 
 class PluginImageResultDto(BaseModel):
     ok: bool = True
     messages: List[str] = Field(default_factory=list)
+
+    @field_validator("messages", mode="before")
+    @classmethod
+    def _coerce_list(cls, v):  # noqa: N805
+        return v if v is not None else []
 
 
 # ---------------------------------------------------------------------------
@@ -293,6 +333,11 @@ class PluginConfigDto(BaseModel):
     height: int = 0
     pluginDto: Optional[PluginDto] = None
     params: Dict[str, str] = Field(default_factory=dict)
+
+    @field_validator("params", mode="before")
+    @classmethod
+    def _coerce_dict(cls, v):  # noqa: N805
+        return v if v is not None else {}
 
 
 # ---------------------------------------------------------------------------
@@ -360,6 +405,11 @@ class PluginParserRequestDto(BaseModel):
     cp: Optional[CalcParamsDto] = None
     p: List[CalcErgebnisDto] = Field(default_factory=list)
 
+    @field_validator("p", mode="before")
+    @classmethod
+    def _coerce_list(cls, v):  # noqa: N805
+        return v if v is not None else []
+
 
 class PluginAngabeRequestDto(BaseModel):
     typ: Optional[str] = None
@@ -374,6 +424,11 @@ class PluginEinheitRequestDto(BaseModel):
     name: Optional[str] = None
     config: Optional[str] = None
     p: List[str] = Field(default_factory=list)
+
+    @field_validator("p", mode="before")
+    @classmethod
+    def _coerce_list(cls, v):  # noqa: N805
+        return v if v is not None else []
 
 
 class PluginConfigurationInfoRequestDto(BaseModel):
@@ -452,6 +507,11 @@ class ServiceInfoDTO(BaseModel):
     adminInfoDto: Optional[AdminInfoDto] = None
     jarLibs: List[str] = Field(default_factory=list)
 
+    @field_validator("jarLibs", mode="before")
+    @classmethod
+    def _coerce_list(cls, v):  # noqa: N805
+        return v if v is not None else []
+
 
 # ---------------------------------------------------------------------------
 # Register / Config service DTOs
@@ -489,3 +549,8 @@ class ConfigServiceDto(BaseModel):
     serviceStartTime: int = 0
     lastRegistrationTime: int = 0
     params: Dict[str, str] = Field(default_factory=dict)
+
+    @field_validator("params", mode="before")
+    @classmethod
+    def _coerce_dict(cls, v):  # noqa: N805
+        return v if v is not None else {}
