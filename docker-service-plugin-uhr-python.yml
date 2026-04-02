@@ -2,7 +2,7 @@ services:
   plugindemo:
     build:
       context: .
-      dockerfile: Dockerfile.python
+      dockerfile: Dockerfile
     image: letto/plugin-demo-python:latest
     container_name: letto-plugindemo-python
     restart: always
