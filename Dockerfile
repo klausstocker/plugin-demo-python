@@ -9,9 +9,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        curl \
-        tzdata \
-        locales && \
+    curl \
+    tzdata \
+    locales && \
     ln -fs /usr/share/zoneinfo/Europe/Vienna /etc/localtime && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
     localedef -i en_US -f UTF-8 en_US.UTF-8 && \
@@ -24,8 +24,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
-COPY scripts/start-python.sh /scripts/start.sh
-COPY scripts/healthcheck-python.sh /scripts/healthcheck.sh
+COPY scripts/start.sh /scripts/start.sh
+COPY scripts/healthcheck.sh /scripts/healthcheck.sh
 
 RUN sed -i 's/\r$//' /scripts/*.sh && \
     chmod 755 /scripts/*.sh

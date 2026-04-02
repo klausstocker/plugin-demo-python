@@ -9,7 +9,7 @@ from app.services.plugin_configuration import plugin_configuration
 router = APIRouter()
 
 
-@router.get("/ping", response_class=PlainTextResponse)
+@router.get("/open/ping", response_class=PlainTextResponse)
 async def ping() -> str:
     return "pong"
 
@@ -19,7 +19,7 @@ async def ping_open() -> str:
     return "pong"
 
 
-@router.get("/info", response_model=ServiceInfoDTO)
+@router.get("/open/info", response_model=ServiceInfoDTO)
 async def info() -> ServiceInfoDTO:
     return plugin_configuration.get_service_info_dto()
 

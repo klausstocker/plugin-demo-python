@@ -85,7 +85,7 @@ class PluginConfiguration:
             programmingLanguage=f"Python {sys.version.split()[0]}",
             nwLettoAddress=settings.network_letto_address,
             dockerName=settings.docker_container_name,
-            uriIntern=settings.letto_plugin_uri_intern or f"http://{settings.network_letto_address}:{settings.port}",
+            uriIntern=settings.letto_plugin_uri_intern or f"http://{settings.network_letto_address}:{settings.port}/open",
             uriInternOk=True,
             uriExtern=settings.letto_plugin_uri_extern or "",
             uriExternOk=bool(settings.letto_plugin_uri_extern),
