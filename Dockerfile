@@ -1,36 +1,38 @@
-FROM eclipse-temurin:21-jdk-jammy
-LABEL maintainer="letto.at"
-LABEL description="Demo-Plugin-Java based on ubuntu"
+FROM python:3.12-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
+LABEL maintainer="Klaus Stocker"
+LABEL description="Demo-Plugin-Python based on FastAPI and Pydantic"
 
-# Linux Grundeinrichtung
-RUN apt-get -y update && \
-    apt-get -y upgrade && \
-    apt-get -y dist-upgrade && \
-    apt-get -y autoremove && \
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl \
+    tzdata \
+    locales && \
     ln -fs /usr/share/zoneinfo/Europe/Vienna /etc/localtime && \
-    apt-get install -y apt-utils curl wget tzdata lsb-release locales && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
-    apt-get install -y nano less dos2unix && \
-    apt-get install -y htop iputils-ping && \
-    localedef -i en_US -f UTF-8 en_US.UTF-8
-
-# Bereinige das Image
-RUN apt-get clean && \
-    apt-get autoclean  && \
+    localedef -i en_US -f UTF-8 en_US.UTF-8 && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-EXPOSE 5080 8080
+WORKDIR /app
 
-RUN mkdir /scripts -p
-COPY target/plugin-demo-java-0.1.jar plugin.jar
-COPY scripts/*.sh     /scripts/
-COPY src/main/resources/revision.txt revision.txt
-RUN dos2unix /scripts/*.sh
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN chmod 755 /scripts/*.sh
+COPY app ./app
+COPY scripts/start.sh /scripts/start.sh
+COPY scripts/healthcheck.sh /scripts/healthcheck.sh
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 CMD bash /scripts/healthcheck.sh
+RUN sed -i 's/\r$//' /scripts/*.sh && \
+    chmod 755 /scripts/*.sh
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD bash /scripts/healthcheck.sh
 
 ENTRYPOINT ["/scripts/start.sh"]

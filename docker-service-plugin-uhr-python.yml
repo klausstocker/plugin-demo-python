@@ -1,0 +1,45 @@
+services:
+  plugindemo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: letto/plugin-demo-python:latest
+    container_name: letto-plugindemo-python
+    restart: always
+    hostname: letto-plugindemo-python
+    mem_limit: ${PLUGINDEMO_MEMORY_LIMIT:-1g}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "3"
+    volumes:
+      - /opt/letto/docker/storage/log/plugindemo:/log
+      - /opt/letto/docker/storage/images:/opt/letto/images
+      - /opt/letto/docker/storage/plugins:/opt/letto/plugins
+    environment:
+      - TZ=Europe/Vienna
+      - LC_ALL=en_US.UTF-8
+      - APP_NAME=plugindemo
+      - PORT=8080
+      - LOG_LEVEL=info
+      - LETTO_SETUP_URI=${LETTO_SETUP_URI:-}
+      - SERVICE_USER_PASSWORD=${SERVICE_USER_PASSWORD:-}
+      - NETWORK_LETTO_ADDRESS=${NETWORK_LETTO_ADDRESS:-letto-plugindemo-python}
+      - DOCKER_CONTAINER_NAME=${DOCKER_CONTAINER_NAME:-letto-plugindemo-python}
+      - LETTO_PLUGIN_URI_INTERN=${LETTO_PLUGIN_URI_INTERN:-}
+      - LETTO_PLUGIN_URI_EXTERN=${LETTO_PLUGIN_URI_EXTERN:-}
+    ports:
+      - "${PLUGINDEMO_PORT:-8080}:8080"
+    networks:
+      - nw-letto
+    healthcheck:
+      test: ["CMD", "bash", "/scripts/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+networks:
+  nw-letto:
+    external: true

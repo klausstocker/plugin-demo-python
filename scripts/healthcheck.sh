@@ -3,7 +3,7 @@
 hc=/healthcounter
 logfile=/log/start.log
 
-result=$(curl --fail http://localhost:8080/ping 2>/dev/null)
+result=$(curl --fail http://localhost:8080/open/ping 2>/dev/null)
 if [ "$result" == "pong" ] ; then
   echo 0 >$hc
   exit 0
