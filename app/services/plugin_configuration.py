@@ -139,8 +139,8 @@ class PluginConfiguration:
             info.typ = name
             info.pluginType = f"{plugin_class.__module__}.{plugin_class.__qualname__}"
             self._plugins[name] = info
-        except Exception:
-            logger.warning("Failed to obtain PluginGeneralInfo for '%s'", name)
+        except Exception as exc:
+            logger.warning("Failed to obtain PluginGeneralInfo for '%s': %s", name, exc)
 
     def create_plugin_service(self, typ: str, name: str, config: str) -> Optional[PluginService]:
         """Instantiate a plugin by type."""
