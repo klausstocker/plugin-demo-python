@@ -2,7 +2,7 @@
 
 from typing import List
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body
 
 from app.models.dto import (
     LoadPluginRequestDto,
@@ -27,15 +27,10 @@ async def plugin_general_info_list() -> PluginGeneralInfoList:
 
 @router.post("/generalinfo", response_model=PluginGeneralInfo)
 async def plugin_general_info(plugintyp: str = Body(..., media_type="text/plain")) -> PluginGeneralInfo:
-    info = plugin_configuration.get_plugin_general_info(plugintyp)
-    if info is None:
-        raise HTTPException(status_code=404, detail=f"Plugin type '{plugintyp}' not found")
-    return info
+    return plugin_configuration.get_plugin_general_info()
 
 
 @router.post("/reloadplugindto", response_model=PluginDto)
 async def reload_plugin_dto(r: LoadPluginRequestDto) -> PluginDto:
-    plugin = plugin_configuration.create_plugin_service(r.typ or "", r.name or "", r.config or "")
-    if plugin is None:
-        raise HTTPException(status_code=404, detail=f"Plugin type '{r.typ}' not found")
+    plugin = plugin_configuration.create_plugin(r.name or "", r.config or "")
     return plugin.reload_plugin_dto(r.params or "", r.q, r.nr)
