@@ -537,9 +537,7 @@ class ConfigServiceDto(BaseModel):
     nwLettoAddress: Optional[str] = None
     dockerName: Optional[str] = None
     uriIntern: Optional[str] = None
-    uriInternOk: bool = False
     uriExtern: Optional[str] = None
-    uriExternOk: bool = False
     username: Optional[str] = None
     password: Optional[str] = None
     extern: bool = False

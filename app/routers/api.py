@@ -4,8 +4,11 @@ from typing import List
 
 from fastapi import APIRouter, Body, HTTPException
 
+from fastapi.responses import HTMLResponse
+
 from app.models.dto import (
     ImageBase64Dto,
+    ImageUrlDto,
     LoadPluginRequestDto,
     PluginAngabeRequestDto,
     PluginConfigDto,
@@ -83,6 +86,12 @@ async def get_maxima(r: PluginRequestDto) -> str:
 async def get_image(r: PluginRequestDto) -> ImageBase64Dto:
     plugin = _create_plugin(r.name, r.config)
     return plugin.get_image_dto(r.params or "", r.q)
+
+
+@router.post("/imageurl", response_model=ImageUrlDto)
+async def get_image_url(r: PluginRequestDto) -> ImageUrlDto:
+    plugin = _create_plugin(r.name, r.config)
+    return plugin.get_image_url(r.params or "", r.q)
 
 
 @router.post("/imagetemplates", response_model=List[List[str]])
@@ -184,3 +193,9 @@ async def get_configuration(r: PluginConfigurationRequestDto) -> str:
     if result is None:
         raise HTTPException(status_code=404, detail=f"Configuration '{r.configurationID}' not found")
     return result
+
+
+@router.get("/confighttp", response_class=HTMLResponse)
+async def config_http() -> str:
+    """Serve an HTML configuration page for the plugin (iframe target)."""
+    return "<html><body><h1>Plugin Configuration</h1></body></html>"
