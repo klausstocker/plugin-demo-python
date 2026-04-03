@@ -135,15 +135,21 @@ class PluginConfiguration:
 
     def create_plugin(self, name: str, config: str) -> PluginService:
         """Create a new instance of the registered plugin."""
+        if self._plugin_class is None:
+            raise RuntimeError("No plugin registered – call register_plugin() first")
         return self._plugin_class(name=name or "", params=config or "")
 
     def get_plugin_list(self) -> List[str]:
-        return [self._plugin_name]
+        if self._plugin_name:
+            return [self._plugin_name]
+        return []
 
-    def get_plugin_general_info(self) -> PluginGeneralInfo:
+    def get_plugin_general_info(self) -> Optional[PluginGeneralInfo]:
         return self._plugin_info
 
     def get_plugin_general_info_list(self) -> PluginGeneralInfoList:
+        if self._plugin_info is None:
+            return PluginGeneralInfoList(pluginInfos=[])
         return PluginGeneralInfoList(pluginInfos=[self._plugin_info])
 
     # ------------------------------------------------------------------

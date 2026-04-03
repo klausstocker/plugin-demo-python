@@ -49,7 +49,10 @@ async def plugin_general_info_list() -> PluginGeneralInfoList:
 
 @router.post("/generalinfo", response_model=PluginGeneralInfo)
 async def plugin_general_info(plugintyp: str = Body(..., media_type="text/plain")) -> PluginGeneralInfo:
-    return plugin_configuration.get_plugin_general_info()
+    info = plugin_configuration.get_plugin_general_info()
+    if info is None:
+        raise HTTPException(status_code=404, detail="No plugin registered")
+    return info
 
 
 @router.post("/gethtml", response_model=str)
