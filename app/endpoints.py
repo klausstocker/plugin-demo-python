@@ -13,7 +13,7 @@ class Endpoint:
     pingopen = open + "/ping"
     INFO = "/info"
     INFO_OPEN = open + "/info"
-    VERSION = "/version"
+    VERSION = open + "/version"
 
     # Plugin endpoints
     getPluginList = "/pluginlist"

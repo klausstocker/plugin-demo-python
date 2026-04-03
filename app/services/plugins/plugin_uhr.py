@@ -8,6 +8,8 @@ from typing import List, Optional, Tuple
 
 from PIL import Image, ImageDraw, ImageFont
 
+from app.services.plugin_configuration import plugin_configuration
+
 from app.models.dto import (
     CalcErgebnisDto,
     CalcParamsDto,
@@ -53,7 +55,7 @@ class PluginUhr(BasePlugin):
     def __init__(self, name: str, params: str) -> None:
         super().__init__(name, params)
         self.typ = "Uhr1"
-        self.version = "1.0"
+        self.version = plugin_configuration.VERSION
         self.helpfiles = ["plugins/uhr/Uhr.html"]
         self.javascript_libs = ["plugins/uhr/uhrScript.js", "plugins/uhr/uhrConfigScript.js"]
         self.java_script = True

@@ -14,14 +14,19 @@ async def ping() -> str:
     return "pong"
 
 
-@router.get("/plugindemo/open/ping", response_class=PlainTextResponse)
-async def ping_open() -> str:
-    return "pong"
-
-
 @router.get("/open/info", response_model=ServiceInfoDTO)
 async def info() -> ServiceInfoDTO:
     return plugin_configuration.get_service_info_dto()
+
+
+@router.get("/open/version", response_class=PlainTextResponse)
+async def version() -> str:
+    return plugin_configuration.VERSION
+
+
+@router.get("/plugindemo/open/ping", response_class=PlainTextResponse)
+async def ping_open() -> str:
+    return "pong"
 
 
 @router.get("/plugindemo/open/info", response_model=ServiceInfoDTO)
