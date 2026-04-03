@@ -52,6 +52,7 @@ class PluginConfiguration:
 
     def __init__(self) -> None:
         self._registry: Dict[str, Type[PluginService]] = {}
+        self._plugins: Dict[str, PluginGeneralInfo] = {}
         self._active_configurations: Dict[str, PluginService] = {}
         self._start_time: float = time.time()
 
@@ -126,8 +127,20 @@ class PluginConfiguration:
             logger.error("Setup service cannot be reached at %s: %s", url, exc)
 
     def register_plugin(self, name: str, plugin_class: Type[PluginService]) -> None:
-        """Register a plugin implementation under the given type name."""
+        """Register a plugin implementation under the given type name.
+
+        Mirrors the Java ``PluginConfiguration.registerPlugin`` behaviour:
+        instantiate the plugin, obtain its ``PluginGeneralInfo``, and cache it.
+        """
         self._registry[name] = plugin_class
+        try:
+            plugin = plugin_class(name="", params="")
+            info = plugin.get_plugin_general_info()
+            info.typ = name
+            info.pluginType = f"{plugin_class.__module__}.{plugin_class.__qualname__}"
+            self._plugins[name] = info
+        except Exception as exc:
+            logger.warning("Failed to obtain PluginGeneralInfo for '%s': %s", name, exc)
 
     def create_plugin_service(self, typ: str, name: str, config: str) -> Optional[PluginService]:
         """Instantiate a plugin by type."""
@@ -137,21 +150,13 @@ class PluginConfiguration:
         return cls(name=name or "", params=config or "")
 
     def get_plugin_list(self) -> List[str]:
-        return list(self._registry.keys())
+        return list(self._plugins.keys())
 
     def get_plugin_general_info(self, typ: str) -> Optional[PluginGeneralInfo]:
-        plugin = self.create_plugin_service(typ, "", "")
-        if plugin is None:
-            return None
-        return plugin.get_plugin_general_info()
+        return self._plugins.get(typ)
 
     def get_plugin_general_info_list(self) -> PluginGeneralInfoList:
-        infos = []
-        for typ in self._registry:
-            info = self.get_plugin_general_info(typ)
-            if info:
-                infos.append(info)
-        return PluginGeneralInfoList(pluginInfos=infos)
+        return PluginGeneralInfoList(pluginInfos=list(self._plugins.values()))
 
     # ------------------------------------------------------------------
     # Configuration session management
