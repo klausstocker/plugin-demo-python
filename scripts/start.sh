@@ -8,6 +8,7 @@ echo "$date : Plugin-Service (Python) starting" >> "$logfile"
 echo "Starting plugin-demo-python with uvicorn..."
 
 exec uvicorn app.main:app \
+    --reload \
     --host 0.0.0.0 \
     --port "${PORT:-8080}" \
     --log-level "${LOG_LEVEL:-info}"
