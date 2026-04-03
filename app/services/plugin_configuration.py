@@ -45,10 +45,10 @@ logger = logging.getLogger(__name__)
 class PluginConfiguration:
     """Manages a single plugin type and its lifecycle."""
 
-    SERVICE_NAME = "plugin-demo-python"
-    VERSION = "0.1"
-    AUTHOR = "Klaus Stocker"
-    LICENSE = "Apache-2.0"
+    SERVICE_NAME = "letto-plugindemo"
+    VERSION = "1.0"
+    AUTHOR = "LeTTo GmbH"
+    LICENSE = "OpenSource"
 
     def __init__(self) -> None:
         self._plugin_class: Optional[Type[PluginService]] = None
