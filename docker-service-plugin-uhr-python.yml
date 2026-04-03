@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     image: letto/plugin-demo-python:latest
-    container_name: letto-plugindemo-python
+    container_name: letto-plugindemo
     restart: always
-    hostname: letto-plugindemo-python
+    hostname: letto-plugindemo
     mem_limit: ${PLUGINDEMO_MEMORY_LIMIT:-1g}
     logging:
       driver: "json-file"
@@ -25,8 +25,8 @@ services:
       - LOG_LEVEL=info
       - LETTO_SETUP_URI=${LETTO_SETUP_URI:-}
       - SERVICE_USER_PASSWORD=${SERVICE_USER_PASSWORD:-}
-      - NETWORK_LETTO_ADDRESS=${NETWORK_LETTO_ADDRESS:-letto-plugindemo-python}
-      - DOCKER_CONTAINER_NAME=${DOCKER_CONTAINER_NAME:-letto-plugindemo-python}
+      - NETWORK_LETTO_ADDRESS=${NETWORK_LETTO_ADDRESS:-letto-plugindemo}
+      - DOCKER_CONTAINER_NAME=${DOCKER_CONTAINER_NAME:-letto-plugindemo}
       - LETTO_PLUGIN_URI_INTERN=${LETTO_PLUGIN_URI_INTERN:-}
       - LETTO_PLUGIN_URI_EXTERN=${LETTO_PLUGIN_URI_EXTERN:-}
     ports:

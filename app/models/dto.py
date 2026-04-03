@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time as _time
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator
 
@@ -19,7 +20,7 @@ from app.models.enums import (
 # ---------------------------------------------------------------------------
 
 class ToleranzDto(BaseModel):
-    toleranz: float = 0.0
+    toleranz: float = 1e-10
     mode: TOLERANZMODE = TOLERANZMODE.RELATIV
 
     def relativ(self) -> bool:
@@ -81,18 +82,18 @@ class VarHashDto(BaseModel):
 # ---------------------------------------------------------------------------
 
 class ImageInfoDto(BaseModel):
-    version: Optional[str] = None
-    pluginTyp: Optional[str] = None
-    filename: Optional[str] = None
-    url: Optional[str] = None
+    version: str = ""
+    pluginTyp: str = ""
+    filename: str = ""
+    url: str = ""
     style: Optional[str] = None
-    alternate: Optional[str] = None
-    title: Optional[str] = None
+    alternate: str = "plugin image"
+    title: str = ""
     width: int = 0
     height: int = 0
-    imageWidth: int = 0
-    unit: IMAGEUNIT = IMAGEUNIT.px
-    lifetime: int = 0
+    imageWidth: int = 100
+    unit: IMAGEUNIT = IMAGEUNIT.none
+    lifetime: int = Field(default_factory=lambda: int(_time.time() * 1000) + 365 * 24 * 3600 * 1000)
 
     def lifetime_outdated(self) -> bool:
         import time
@@ -177,17 +178,17 @@ class PluginConfigurationInfoDto(BaseModel):
     CONFIGMODE_JAVASCRIPT: int = Field(default=2, exclude=True)
     CONFIGMODE_URL: int = Field(default=3, exclude=True)
 
-    configurationID: Optional[str] = None
+    configurationID: str = ""
     javaScriptMethode: Optional[str] = None
-    configurationUrl: Optional[str] = None
-    configurationMode: int = 1
+    configurationUrl: str = ""
+    configurationMode: int = 0
     useQuestion: bool = True
-    useVars: bool = True
-    useCVars: bool = True
-    useMaximaVars: bool = True
-    useMVars: bool = True
-    addDataSet: bool = True
-    calcMaxima: bool = True
+    useVars: bool = False
+    useCVars: bool = False
+    useMaximaVars: bool = False
+    useMVars: bool = False
+    addDataSet: bool = False
+    calcMaxima: bool = False
     externUrl: bool = False
 
 
@@ -227,13 +228,13 @@ class PluginQuestionDto(BaseModel):
 # ---------------------------------------------------------------------------
 
 class PluginDto(BaseModel):
-    imageUrl: Optional[str] = None
-    tagName: Optional[str] = None
+    imageUrl: str = ""
+    tagName: str = ""
     jsonData: Optional[str] = None
     pig: bool = False
     result: bool = False
-    width: int = 0
-    height: int = 0
+    width: int = 500
+    height: int = 500
     params: Dict[str, str] = Field(default_factory=dict)
 
     @field_validator("params", mode="before")
@@ -320,17 +321,17 @@ class PluginMaximaCalcModeDto(BaseModel):
 # ---------------------------------------------------------------------------
 
 class PluginConfigDto(BaseModel):
-    typ: Optional[str] = None
-    name: Optional[str] = None
-    config: Optional[str] = None
-    tagName: Optional[str] = None
+    typ: str = ""
+    name: str = ""
+    config: str = ""
+    tagName: str = ""
     configurationID: Optional[str] = None
     errorMsg: Optional[str] = None
     pluginDtoUri: Optional[str] = None
     pluginDtoToken: Optional[str] = None
     jsonData: Optional[str] = None
-    width: int = 0
-    height: int = 0
+    width: int = 500
+    height: int = 500
     pluginDto: Optional[PluginDto] = None
     params: Dict[str, str] = Field(default_factory=dict)
 

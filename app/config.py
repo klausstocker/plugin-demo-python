@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     letto_setup_uri: str = ""
     service_user_username: str = "user"
     service_user_password: str = ""
-    network_letto_address: str = "letto-plugindemo-python"
-    docker_container_name: str = "letto-plugindemo-python"
+    network_letto_address: str = "letto-plugindemo"
+    docker_container_name: str = "letto-plugindemo"
     letto_plugin_uri_intern: str = ""
     letto_plugin_uri_extern: str = ""
 
