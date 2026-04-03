@@ -13,7 +13,6 @@ from app.services.plugins.plugin_uhr import PluginUhr
 
 @asynccontextmanager
 async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
-    plugin_configuration.init()
     plugin_configuration.register_plugin("Uhr1", PluginUhr)
     plugin_configuration.register_plugin_in_setup()
     yield
