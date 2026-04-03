@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time as _time
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator
 
@@ -92,7 +93,7 @@ class ImageInfoDto(BaseModel):
     height: int = 0
     imageWidth: int = 100
     unit: IMAGEUNIT = IMAGEUNIT.none
-    lifetime: int = Field(default_factory=lambda: int(__import__('time').time() * 1000) + 365 * 24 * 3600 * 1000)
+    lifetime: int = Field(default_factory=lambda: int(_time.time() * 1000) + 365 * 24 * 3600 * 1000)
 
     def lifetime_outdated(self) -> bool:
         import time
