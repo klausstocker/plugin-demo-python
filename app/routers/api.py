@@ -172,9 +172,18 @@ async def render_plugin_result(r: PluginRenderResultRequestDto) -> PluginRenderD
 
 @router.post("/configurationinfo", response_model=PluginConfigurationInfoDto)
 async def configuration_info(r: PluginConfigurationInfoRequestDto) -> PluginConfigurationInfoDto:
-    return plugin_configuration.configuration_info(
-        r.name, r.config, r.configurationID or "", r.timeout
+    configuration_id = r.configurationID or ""
+    typ = r.typ or ""
+    result = plugin_configuration.configuration_info(
+        typ, r.name or "", r.config or "", configuration_id, r.timeout
     )
+    result.configurationUrl = (
+        plugin_configuration.base_uri_extern
+        + plugin_configuration.IFRAME_CONFIG
+        + "?typ=" + typ
+        + "&configurationID=" + configuration_id
+    )
+    return result
 
 
 @router.post("/setconfigurationdata", response_model=PluginConfigDto)
