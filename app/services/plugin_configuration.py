@@ -50,12 +50,21 @@ class PluginConfiguration:
     AUTHOR = "LeTTo GmbH"
     LICENSE = "OpenSource"
 
+    # Matches Java Endpoint.iframeConfig = open + configurationHttp
+    IFRAME_CONFIG = "/plugindemo/open/confighttp"
+
     def __init__(self) -> None:
         self._plugin_class: Optional[Type[PluginService]] = None
         self._plugin_name: str = ""
         self._plugin_info: Optional[PluginGeneralInfo] = None
         self._active_configurations: Dict[str, PluginService] = {}
         self._start_time: float = time.time()
+
+    @property
+    def base_uri_extern(self) -> str:
+        """Return the external base URI (trailing slashes stripped), matching Java's getBaseUriExtern()."""
+        uri = (settings.letto_plugin_uri_extern or "").rstrip("/")
+        return uri
 
     def register_plugin(self, name: str, plugin_class: Type[PluginService]) -> None:
         """Register the plugin implementation under the given type name."""
@@ -155,7 +164,7 @@ class PluginConfiguration:
     # ------------------------------------------------------------------
 
     def configuration_info(
-        self, name: str, config: str, configuration_id: str, timeout: int
+        self, typ: str, name: str, config: str, configuration_id: str, timeout: int
     ) -> PluginConfigurationInfoDto:
         plugin = self.create_plugin(name, config)
         info = plugin.configuration_info(configuration_id)
