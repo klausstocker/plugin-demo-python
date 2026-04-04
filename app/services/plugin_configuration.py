@@ -90,7 +90,7 @@ class PluginConfiguration:
             ip = ""
 
         now_ms = _to_date_integer(datetime.now())
-
+        print(f'{settings.letto_plugin_uri_intern=}')
         payload = ConfigServiceDto(
             name=self.SERVICE_NAME,
             version=self.VERSION,
@@ -102,8 +102,8 @@ class PluginConfiguration:
             programmingLanguage=f"Python {sys.version.split()[0]}",
             nwLettoAddress=settings.network_letto_address,
             dockerName=settings.docker_container_name,
-            uriIntern=settings.letto_plugin_uri_intern or f"http://{settings.network_letto_address}:{settings.port}/open",
-            uriExtern=settings.letto_plugin_uri_extern or "",
+            uriIntern=settings.letto_plugin_uri_intern,
+            uriExtern=settings.letto_plugin_uri_extern,
             username=settings.service_user_username,
             password=settings.service_user_password,
             extern=True,

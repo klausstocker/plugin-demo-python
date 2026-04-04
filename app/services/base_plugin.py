@@ -250,19 +250,20 @@ class BasePlugin(PluginService):
     def update_pluginstring_javascript(self, plugin_def: Optional[str], js_result: Optional[str]) -> str:
         return plugin_def or ""
 
-    def configuration_info(self, configuration_id: Optional[str]) -> PluginConfigurationInfoDto:
-        return PluginConfigurationInfoDto(
-            configurationID=configuration_id,
-            configurationMode=self.configuration_mode,
-            useQuestion=self.use_question,
-            useVars=self.use_vars,
-            useCVars=self.use_cvars,
-            useMaximaVars=self.use_maxima_vars,
-            useMVars=self.use_mvars,
-            addDataSet=self.add_data_set,
-            calcMaxima=self.calc_maxima,
-            externUrl=self.extern_url,
-        )
+def configuration_info(self, configuration_id: Optional[str]) -> PluginConfigurationInfoDto:
+    return PluginConfigurationInfoDto(
+        configurationID=configuration_id,
+        javaScriptMethode=self.config_plugin_js,  # ← Add this (default is "configPlugin")
+        configurationMode=self.configuration_mode,
+        useQuestion=self.use_question,
+        useVars=self.use_vars,
+        useCVars=self.use_cvars,
+        useMaximaVars=self.use_maxima_vars,
+        useMVars=self.use_mvars,
+        addDataSet=self.add_data_set,
+        calcMaxima=self.calc_maxima,
+        externUrl=self.extern_url,
+    )
 
     def set_configuration_data(self, configuration: Optional[str], question_dto: Optional[PluginQuestionDto]) -> PluginConfigDto:
         return PluginConfigDto(typ=self.typ, name=self.name, config=configuration or self.config)

@@ -19,12 +19,13 @@ class Settings(BaseSettings):
     service_user_password: str = ""
     network_letto_address: str = "letto-plugindemo"
     docker_container_name: str = "letto-plugindemo"
-    letto_plugin_uri_intern: str = ""
+    letto_plugin_uri_intern: str =  f"http://{network_letto_address}:{port}/open"
     letto_plugin_uri_extern: str = ""
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parent.parent / ".env",
         env_file_encoding="utf-8",
+        extra='ignore'
     )
 
 
