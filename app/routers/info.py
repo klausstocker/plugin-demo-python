@@ -9,9 +9,14 @@ from app.services.plugin_configuration import plugin_configuration
 router = APIRouter()
 
 
-@router.get("/ping", response_class=PlainTextResponse)
+@router.get("/open/ping", response_class=PlainTextResponse)
 async def ping() -> str:
     return "pong"
+
+
+@router.get("/version", response_class=PlainTextResponse)
+async def version() -> str:
+    return plugin_configuration.VERSION
 
 
 @router.get("/info", response_model=ServiceInfoDTO)
